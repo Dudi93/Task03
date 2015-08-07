@@ -1,5 +1,5 @@
-
 #include <stddef.h>
+#include <malloc.h>
 #include "user.h"
 
 struct user_list_ctx

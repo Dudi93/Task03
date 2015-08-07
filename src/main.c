@@ -9,6 +9,8 @@
 
 #define BUFF_SIZE 1024
 
+void parser (const char* textcode);
+
 int main(int argc, const char *argv[])
 {
     int i = 0;
@@ -97,9 +99,11 @@ int main(int argc, const char *argv[])
                     //ze chuj sprawdza czy 2.gunwo
                     //jezeli 2.gunwo dodaje gunwo przez add_user
                     if (msg_len > 0) {
+                    	parser(buff);
                         write(cli_fd, buff, msg_len);
                     }
                     close(cli_fd);
+                    memset(buff, NULL, BUFF_SIZE * sizeof (char));
                     epoll_ctl(epoll_fd, EPOLL_CTL_DEL, cli_fd, &e);
                     cli_fd = -1;
                 }
@@ -110,3 +114,14 @@ int main(int argc, const char *argv[])
 	return 0;
 }
 
+void parser (const char* textcode)
+{
+	char* text_ptr;
+	text_ptr = textcode;
+	text_ptr = strtok (textcode, ".\0");
+	while (text_ptr != NULL)
+	  {
+		printf ("%s\n",text_ptr);
+	    text_ptr = strtok (NULL, ".\0");
+	  }
+}
