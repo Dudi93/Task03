@@ -94,6 +94,8 @@ int main(int argc, const char *argv[])
             } else {
                 if (es[i].events & EPOLLIN) {
                     msg_len = read(cli_fd, buff, BUFF_SIZE);
+                    //ze chuj sprawdza czy 2.gunwo
+                    //jezeli 2.gunwo dodaje gunwo przez add_user
                     if (msg_len > 0) {
                         write(cli_fd, buff, msg_len);
                     }
