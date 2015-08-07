@@ -15,7 +15,7 @@
 #######################################################
 CFLAGS = -Wall -g
 LDFLAGS =
-SOURCES = ./src/main.c
+SOURCES = ./src/main.c ./src/user.c
 NAME = prog
 #######################################################
 ##########        END User part              ##########
@@ -30,10 +30,10 @@ OBJECTS = $(SOURCES:.c=.o)
 all: $(NAME)
 
 $(NAME): $(OBJECTS)
-	$(CC) $(OBJECTS) $(LDFLAGS) -o $(NAME) -pthread
+	$(CC) $(OBJECTS) $(LDFLAGS) -o $(NAME)
 
 %.o: %.c
-	$(CC) -c $(CFLAGS) $< -o $@ -pthread
+	$(CC) -c $(CFLAGS) $< -o $@
 
 clean:
 	rm -f $(OBJECTS)
