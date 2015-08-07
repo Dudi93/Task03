@@ -9,7 +9,7 @@
 
 #define BUFF_SIZE 1024
 
-void parser (const char* textcode);
+void parser (char* textcode);
 
 int main(int argc, const char *argv[])
 {
@@ -20,6 +20,8 @@ int main(int argc, const char *argv[])
     int srv_fd = -1;
     int cli_fd = -1;
     int epoll_fd = -1;
+
+    int ile;
 
     struct sockaddr_in srv_addr;
     struct sockaddr_in cli_addr;
@@ -95,11 +97,14 @@ int main(int argc, const char *argv[])
                 }
             } else {
                 if (es[i].events & EPOLLIN) {
-                    msg_len = read(cli_fd, buff, BUFF_SIZE);
+                    //msg_len = read(cli_fd, buff, BUFF_SIZE);
                     //ze chuj sprawdza czy 2.gunwo
                     //jezeli 2.gunwo dodaje gunwo przez add_user
+                	int dlugosc = 0;
+                	read(cli_fd, &dlugosc, sizeof(size_t));
+                	ile = read(cli_fd, buff, dlugosc);
+                    parser(buff);
                     if (msg_len > 0) {
-                    	parser(buff);
                         write(cli_fd, buff, msg_len);
                     }
                     close(cli_fd);
@@ -114,10 +119,9 @@ int main(int argc, const char *argv[])
 	return 0;
 }
 
-void parser (const char* textcode)
+void parser (char* textcode)
 {
-	char* text_ptr;
-	text_ptr = textcode;
+	char* text_ptr = textcode;
 	text_ptr = strtok (textcode, ".\0");
 	while (text_ptr != NULL)
 	  {
