@@ -65,11 +65,10 @@ static ssize_t get_user_list_size(struct user_list* self)
 	ssize_t size = self->ctx->size;
 	return size;
 }
-static char** get_users(struct user_list* self, int cli_fd, size_t size)
+static void get_users(struct user_list* self, int cli_fd, char* strings[], size_t size)
 {
 	size_t i = 0;
 	char** names;
-	names = malloc(size * sizeof(char*));
 	for(; i < self->ctx->size; ++i)
 	{
 		if(self->ctx->users[i] && self->ctx->users[i]->fd != 0)
@@ -79,7 +78,6 @@ static char** get_users(struct user_list* self, int cli_fd, size_t size)
 		else
 			break;
 	}
-	return names;
 }
 
 user_list* construct(size_t size)
