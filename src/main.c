@@ -146,11 +146,11 @@ void handle_login(char* buff, int cli_fd)
 
 void handle_userlist(int cli_fd)
 {
+	char** names;
 	size_t size = list->get_user_list_size(list);
-	char* names[size];
 	size_t* lengths;
 
-	list->get_users(list, cli_fd, names, size);
+	names = list->get_users(list, cli_fd, size);
 
 	printf("%s", names[0]);
 
