@@ -22,6 +22,18 @@ static int add_user(user_list* self, user* u)
 	return 1;
 }
 
+user* create_user(int fd, char* name)
+{
+	user* res = malloc(sizeof(user));
+	res->fd = fd;
+	if (strlen(name) >= sizeof(res->nick)) {
+	    printf("Nick too long: %s\n", name);
+	    exit(1);
+	}
+	strcpy(res->nick, name);
+	return res;
+}
+
 static int del_user_by_fd(user_list* self, int fd)
 {
 	size_t i = 0;
@@ -48,6 +60,28 @@ user* find_user_by_fd(user_list* self, int fd)
 	return 0;
 }
 
+static ssize_t get_user_list_size(struct user_list* self)
+{
+	ssize_t size = self->ctx->size;
+	return size;
+}
+static char** get_users(struct user_list* self, int cli_fd, size_t size)
+{
+	size_t i = 0;
+	char** names;
+	names = malloc(size * sizeof(char*));
+	for(; i < self->ctx->size; ++i)
+	{
+		if(self->ctx->users[i] && self->ctx->users[i]->fd != 0)
+		{
+			names[i] = self->ctx->users[i]->nick;
+		}
+		else
+			break;
+	}
+	return names;
+}
+
 user_list* construct(size_t size)
 {
 	user_list* res = malloc (sizeof(user_list));
@@ -58,6 +92,8 @@ user_list* construct(size_t size)
 	res->add_user = add_user;
 	res->del_user_by_fd = del_user_by_fd;
 	res->find_user_by_fd = find_user_by_fd;
+	res->get_user_list_size = get_user_list_size;
+	res->get_users = get_users;
 
 	return res;
 }

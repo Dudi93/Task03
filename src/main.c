@@ -7,14 +7,18 @@
 #include <sys/epoll.h>
 #include <arpa/inet.h>
 
-#define BUFF_SIZE 1024
+#include "server_manager.h"
+#include "user.h"
 
-void parser (char* textcode);
+void handle_login(char* buff, int cli_fd);
+void handle_userlist(int cli_fd);
+
+user_list* list;
 
 int main(int argc, const char *argv[])
 {
+	list = construct(10);
     int i = 0;
-    char buff[BUFF_SIZE];
     ssize_t msg_len = 0;
 
     int srv_fd = -1;
@@ -100,17 +104,30 @@ int main(int argc, const char *argv[])
                     //msg_len = read(cli_fd, buff, BUFF_SIZE);
                     //ze chuj sprawdza czy 2.gunwo
                     //jezeli 2.gunwo dodaje gunwo przez add_user
-                	int dlugosc = 0;
-                	read(cli_fd, &dlugosc, sizeof(size_t));
-                	ile = read(cli_fd, buff, dlugosc);
-                    parser(buff);
-                    if (msg_len > 0) {
-                        write(cli_fd, buff, msg_len);
-                    }
-                    close(cli_fd);
-                    memset(buff, NULL, BUFF_SIZE * sizeof (char));
-                    epoll_ctl(epoll_fd, EPOLL_CTL_DEL, cli_fd, &e);
-                    cli_fd = -1;
+                	char *buff = 0;
+                	size_t length = 0;
+                	read(cli_fd, &length, sizeof(size_t));
+                	//TODO error handling (call clean_client_fd)
+                	buff = malloc((length + 1) * sizeof(char));
+                	buff[length] = '\0';
+                	ile = read(cli_fd, buff, length);
+                	//TODO error handling (call clean_client_fd)
+
+                	switch (buff[0]) {
+                	case '2':
+                		//TODO handle_login(...);
+                		handle_login(buff, cli_fd);
+                		break;
+                	case '6':
+                		//TODO hndle_userlist(...);
+                		handle_userlist(cli_fd);
+                		break;
+                	default:
+                		//Unknown message handling
+                		break;
+                	}
+
+                	free(buff);
                 }
             }
         }
@@ -119,13 +136,40 @@ int main(int argc, const char *argv[])
 	return 0;
 }
 
-void parser (char* textcode)
+void handle_login(char* buff, int cli_fd)
 {
-	char* text_ptr = textcode;
-	text_ptr = strtok (textcode, ".\0");
-	while (text_ptr != NULL)
-	  {
-		printf ("%s\n",text_ptr);
-	    text_ptr = strtok (NULL, ".\0");
-	  }
+	char* msg;
+	strcpy(msg, buff +2);
+	user* user = create_user(cli_fd, msg);
+	list->add_user(list, user);
+}
+
+void handle_userlist(int cli_fd)
+{
+	char** names;
+	size_t size = list->get_user_list_size(list);
+	size_t* lengths;
+
+	names=list->get_users(list, cli_fd, size);
+
+	size_t i = 0;
+
+	for(; i < size; ++i)
+	{
+		char* msg;
+		strcpy(msg, names[i][0]);
+		lengths[i] = strlen(msg);
+	}
+
+	//user* user = list->ctx->users[0];
+	//name = user->nick;
+	//ssize_t length = strlen(name);
+	//write(cli_fd, name, length);
+}
+
+void clean_client_fd(int cli_fd, int epoll_fd)
+{
+	//TODO: remove user from the list
+	epoll_ctl(epoll_fd, EPOLL_CTL_DEL, cli_fd, 0);
+	close(cli_fd);
 }
