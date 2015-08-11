@@ -1,8 +1,8 @@
 #include "server_eh.h"
 #include "client_eh.h"
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
+#include "reactor.h"
+#include <sys/epoll.h>
+#include <arpa/inet.h>
 
 typedef struct event_handler_ctx {
 	int fd;
@@ -17,7 +17,7 @@ void handle_event(event_handler *self, uint32_t e){
 	event_handler *eh=0;
 	int cli_fd=-1;
 	struct sockaddr_in cli_addr;
-	struct socklen_t cli_addr_len = sizeof(struct sockaddr_in);
+	socklen_t cli_addr_len = sizeof(cli_addr);
 	cli_fd = accept (self->ctx->fd, &cli_addr, &cli_addr_len);
 	eh = alloc_client_eh(cli_fd, self->ctx->r);
 	self->ctx->r->add(self->ctx->r,eh);

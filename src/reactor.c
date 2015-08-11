@@ -2,6 +2,9 @@
 #include "user_list.h"
 #include <sys/epoll.h>
 
+typedef struct user user;
+typedef struct user_list user_list;
+
 typedef struct reactor_ctx {
 	user_list *ul;
 	int epoll_fd;
@@ -9,7 +12,7 @@ typedef struct reactor_ctx {
 } reactor_ctx;
 
 static void add(reactor *self, event_handler *eh){
-	user* u = 0;
+	user *u=0;
 	int fd = eh->get_fd(eh);
 	struct epoll_event e;
 	memset(&e, 0, sizeof(struct epoll_event));
@@ -26,7 +29,7 @@ static void add(reactor *self, event_handler *eh){
 
 static void rm (reactor *self, event_handler *eh){
 	int fd = eh->get_fd(eh);
-	self->ctx->ul->rm_user_by_fd(self->ctx, fd);
+	self->ctx->ul->rm_user_by_fd(self->ctx->ul->ctx, fd);
 	//err
 	epoll_ctl(self->ctx->epoll_fd, EPOLL_CTL_DEL, fd, 0);
 	//err
@@ -36,7 +39,7 @@ static void rm (reactor *self, event_handler *eh){
 static void event_loop (reactor *self){
 	int i=0;
 	struct epoll_event es[self->ctx->size];
-	memset(es,0, self->ctx->size);
+	memset(&es,0,sizeof(struct epoll_event));
 	for(;;){
 		i=epoll_wait(self->ctx->epoll_fd,es,self->ctx->size,-1);
 		//err
@@ -69,7 +72,4 @@ reactor* alloc_reactor(size_t size, user_list* ul){
 	return r;
 }
 
-void free_reactor(reactor* r)
-{
-
-}
+void free_reactor(reactor* r);

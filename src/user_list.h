@@ -1,5 +1,8 @@
 #include <stdlib.h>
 
+typedef struct event_handler event_handler;
+typedef struct user_list user_list;
+
 #define MAX_USERS 1000
 #define MAX_USER_NAME 50
 
