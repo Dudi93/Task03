@@ -9,6 +9,7 @@
 #include <errno.h>
 
 #include "user_list.h"
+#include "reactor.h"
 #include "ru.h"
 
 extern errno;
@@ -185,4 +186,3 @@ int handle_client_message(int fd, struct message* m, struct user_list* ul)
 	delete_message(m);
 	return result;
 }
-

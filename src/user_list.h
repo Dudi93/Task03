@@ -6,6 +6,7 @@
 struct user {
 	int fd;
 	char name[MAX_USER_NAME];
+	event_handler *eh;
 };
 
 struct user_list_ctx;
@@ -22,4 +23,3 @@ struct user_list {
 
 struct user_list* create_user_list();
 void delete_user_list(struct user_list* ul);
-

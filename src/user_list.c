@@ -97,4 +97,3 @@ void delete_user_list(struct user_list* ul)
 	free(ul->ctx);
 	free(ul);
 }
-
